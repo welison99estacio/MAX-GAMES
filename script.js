@@ -135,17 +135,19 @@ setInterval(() => {
   });
 }, 1000);
 
-// Renderiza clientes ativos
 function renderClientes() {
   clientesDiv.innerHTML = "";
   clientes.forEach((c, idx) => {
     const card = document.createElement("div");
     card.className = "cliente";
     card.onclick = () => abrirModal(idx);
+
     card.innerHTML = `
+      <strong style="display:block; margin-bottom:4px;">${c.nome}</strong>
       <img src="${c.tipo === 'PS5' ? 'ps5.jpg' : 'PC.png'}" alt="${c.tipo}">
       <p></p>
     `;
+
     clientesDiv.append(card);
   });
 }

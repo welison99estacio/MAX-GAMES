@@ -26,32 +26,53 @@
           <input type="number" id="precoHora" step="0.01" min="0">
           <button id="salvarPreco">💾 Salvar</button>
         </div>
-        <h3>Histórico de Uso</h3>
-        <ul id="historico"></ul>
-        <div class="config-actions">
-          <button id="limparHistorico">Limpar Histórico</button>
+        <h3>Histórico</h3>
+        <div class="table-container">
+          <table id="historicoTable">
+            <thead>
+              <tr>
+                <th>Equipamento</th>
+                <th>Valor (R$)</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas inseridas via JS -->
+            </tbody>
+          </table>
         </div>
+        <button id="limparHistorico">Limpar Histórico</button>
       </div>
     </section>
 
+    <!-- Botão para mostrar formulário -->
+    <div class="center">
+      <button id="mostrarForm" class="destaque">Adicionar cliente</button>
+    </div>
+
     <!-- Formulário -->
-    <section class="form-section">
-      <form id="formulario">
+    <section id="form-section" class="form-section escondido">
+      <div class="form-box">
         <div class="form-row">
-          <select id="tipo"></select>
-          <select id="nome"></select>
+          <label><input type="radio" name="tipo" value="PS5"> PS5</label>
+          <label><input type="radio" name="tipo" value="PC"> PC</label>
         </div>
-        <div id="temposRapidos" class="form-row">
-          <button type="button" data-min="30">30 min</button>
-          <button type="button" data-min="60">1 h</button>
-          <button type="button" data-min="90">1:30 h</button>
-          <button type="button" data-min="120">2 h</button>
-          <button type="button" data-min="0">Tempo Aberto</button>
-          <!-- DEBUG: tempo de teste -->
-          <button type="button" data-min="0.083">Teste (5 s)</button>
+        <div class="form-row">
+          <select id="nome" class="escondido"></select>
         </div>
-        <button id="adicionar" type="submit" class="destaque">🎮 Adicionar</button>
-      </form>
+        <div class="form-row">
+          <select id="tempo" class="escondido">
+            <option value="30">30 min</option>
+            <option value="60">1 h</option>
+            <option value="90">1:30 h</option>
+            <option value="120">2 h</option>
+            <option value="0">Tempo Aberto</option>
+            <!-- DEBUG: 5s -->
+            <option value="0.083">Teste (5 s)</option>
+          </select>
+        </div>
+        <button id="adicionar" class="destaque">🎮 Adicionar</button>
+      </div>
     </section>
 
     <!-- Clientes Ativos -->
@@ -64,7 +85,7 @@
   <!-- Modal -->
   <div id="modal" class="modal escondido">
     <div class="modal-content">
-      <h2 id="modal-nome">
+      <h2>
         <span id="modal-nome-text"></span>
         <span id="modal-edit" class="edit-icon">🖉</span>
       </h2>
@@ -73,7 +94,7 @@
       <p><strong>Valor:</strong> R$ <span id="modal-valor"></span></p>
       <div class="modal-actions">
         <button id="modal-parar">Parar</button>
-        <button id="modal-adicionar-tempo" class="escondido">Adicionar Tempo</button>
+        <button id="modal-adicionar-tempo" class="escondido">Adicionar Tempo</button>
         <select id="modal-tempos-lista" class="escondido">
           <option value="30">30 min</option>
           <option value="60">1 h</option>

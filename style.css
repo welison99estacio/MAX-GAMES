@@ -4,9 +4,14 @@
   --accent: #e91e63;
   --bg: #f9f9f9;
   --white: #fff;
+  --zebra: #f3f3f3;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   font-family: 'Inter', sans-serif;
@@ -27,7 +32,11 @@ header {
   margin-bottom: 15px;
 }
 
-header h1 { color: var(--primary); font-size: 1.8em; }
+header h1 {
+  color: var(--primary);
+  font-size: 1.8em;
+}
+
 header button {
   background: var(--primary);
   color: var(--white);
@@ -35,6 +44,29 @@ header button {
   border-radius: 6px;
 }
 
+.center {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+/* Destaque dos botões principais */
+.destaque {
+  background: var(--accent);
+  color: #fff;
+  padding: 12px 20px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* Formulário e Configuração */
 .form-section,
 .clients-section,
 #config {
@@ -45,64 +77,91 @@ header button {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.config-box h2 { margin-bottom: 12px; color: var(--primary); }
+.form-box,
+.config-box {
+  max-width: 400px;
+  margin: auto;
+}
+
+/* Alinhamento das linhas de formulário */
+.form-row,
 .config-row {
   display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.config-row input { flex: 1; }
-.config-row button {
-  background: var(--accent);
-}
-
-.config-actions { margin-top: 15px; }
-
-.form-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;       /* não quebrar em colunas */
+  justify-content: center; /* centraliza horizontal */
+  align-items: center;     /* alinha vertical */
+  gap: 20px;               /* espaçamento entre itens */
   margin-bottom: 15px;
 }
 
-select, input, button {
+/* Labels dentro de form-row */
+.form-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+/* Comboboxes com largura fixa e espaçamento */
+#nome,
+#tempo {
+  width: 180px;            /* largura igual */
+}
+
+/* Espaço extra abaixo dos selects */
+#nome,
+#tempo {
+  margin-bottom: 10px;
+}
+
+/* Campos comuns */
+select,
+input,
+button {
   font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 6px;
 }
 
-select, input {
+select,
+input {
   padding: 8px 12px;
   background: #fff;
 }
 
-#temposRapidos button {
-  background: #555;
-  color: var(--white);
-  padding: 6px 10px;
+/* Tabela de histórico */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 15px;
 }
 
-#temposRapidos button.selecionado,
-button.destaque {
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
-}
-
-button.destaque {
-  display: block;
+table#historicoTable {
   width: 100%;
-  padding: 12px;
-  font-size: 1.1em;
-  font-weight: bold;
-  margin-top: 10px;
+  border-collapse: collapse;
+  font-size: 0.95em;
 }
 
-.clients-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 15px;
+#historicoTable thead {
+  background: var(--primary);
+  color: #fff;
 }
 
+#historicoTable th,
+#historicoTable td {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+#historicoTable tbody tr:nth-child(odd) {
+  background: var(--zebra);
+}
+
+#historicoTable tbody tr:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Clientes */
 .cliente {
   background: var(--white);
   border-radius: 8px;
@@ -113,7 +172,8 @@ button.destaque {
 }
 
 .cliente img {
-  width: 60px; height: 60px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
   margin-bottom: 8px;
 }
@@ -123,6 +183,7 @@ button.destaque {
   color: #555;
 }
 
+/* Ícone de edição no modal */
 .edit-icon {
   cursor: pointer;
   margin-left: 8px;
@@ -130,32 +191,59 @@ button.destaque {
   vertical-align: middle;
 }
 
-.escondido { display: none !important; }
-
 /* Modal */
 .modal {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6); display: flex;
-  align-items: center; justify-content: center; padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
   z-index: 10;
 }
+
 .modal-content {
-  background: var(--white); border-radius: 8px;
-  padding: 20px; max-width: 320px; width: 100%;
-}
-.modal-content h2 {
-  margin-bottom: 10px; display: flex; align-items: center;
-}
-.modal-actions {
-  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px;
-}
-.modal-actions button, .modal-actions select {
-  flex: 1; padding: 8px; font-size: 0.9em; border-radius: 6px;
+  background: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 320px;
+  width: 100%;
 }
 
-/* Responsivo */
+.modal-content h2 {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.modal-actions button,
+.modal-actions select {
+  flex: 1;
+  padding: 8px;
+  font-size: 0.9em;
+  border-radius: 6px;
+}
+
+.escondido {
+  display: none !important;
+}
+
+/* Responsivo para telas pequenas */
 @media (max-width: 600px) {
-  .form-row, .config-row, .modal-actions {
+  .form-row,
+  .config-row,
+  .modal-actions {
     flex-direction: column;
   }
 }

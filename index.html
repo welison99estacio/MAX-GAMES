@@ -1,68 +1,69 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MAX GAMES - Gerenciador</title>
-
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0055aa">
   <link rel="icon" href="./icon-192.png">
-
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <h1>Gerenciador de Tempo</h1>
+  <div class="container">
+    <header>
+      <h1>Gerenciador de Tempo</h1>
+      <button id="abrirConfig">⚙ Configurações</button>
+    </header>
 
-  <button id="abrirConfig">⚙ Configurações</button>
+    <section id="config" class="escondido">
+      <div class="config-box">
+        <h2>Configurações</h2>
+        <div class="config-row">
+          <label for="precoHora">Valor por hora (R$):</label>
+          <input type="number" id="precoHora" value="6" step="0.01" min="0">
+        </div>
+        <h3>Histórico de Uso</h3>
+        <ul id="historico"></ul>
+        <div class="config-actions">
+          <button id="limparHistorico">Limpar Histórico</button>
+          <button id="fecharConfig">Fechar</button>
+        </div>
+      </div>
+    </section>
 
-  <section id="config" class="escondido">
-    <div class="config-box">
-      <h2>Configurações</h2>
-      <label for="precoHora">Valor por hora (R$):</label>
-      <input type="number" id="precoHora" value="6" step="0.01" min="0">
+    <section class="form-section">
+      <form id="formulario">
+        <div class="form-row">
+          <select id="tipo"></select>
+          <select id="nome"></select>
+        </div>
+        <div id="temposRapidos" class="form-row">
+          <button type="button" data-min="30">30 min</button>
+          <button type="button" data-min="60">1h</button>
+          <button type="button" data-min="90">1:30h</button>
+          <button type="button" data-min="120">2h</button>
+          <button type="button" data-min="0">Tempo Aberto</button>
+          <!-- DEBUG: tempo de teste -->
+          <button type="button" data-min="0.083">Teste (5s)</button>
+        </div>
+        <button id="adicionar" type="submit" class="destaque">🎮 Adicionar</button>
+      </form>
+    </section>
 
-      <h3>Histórico de Uso</h3>
-      <ul id="historico"></ul>
-      <button id="limparHistorico">Limpar Histórico</button>
-      <br><br>
-      <button id="fecharConfig">Fechar</button>
-    </div>
-  </section>
-
-  <form id="formulario">
-    <select id="tipo">
-      <option value="PS5">PS5</option>
-      <option value="PC">PC</option>
-    </select>
-
-    <select id="nome"></select>
-
-    <div id="temposRapidos">
-      <button type="button" data-min="30">30 min</button>
-      <button type="button" data-min="60">1h</button>
-      <button type="button" data-min="90">1:30h</button>
-      <button type="button" data-min="120">2h</button>
-      <button type="button" data-min="0">Tempo Aberto</button>
-
-      <!-- DEBUG: tempo de teste -->
-      <button type="button" data-min="0.083">Teste (5s)</button>
-    </div>
-
-    <button id="adicionar" type="submit" class="destaque">🎮 Adicionar</button>
-  </form>
-
-  <h2>Clientes Ativos</h2>
-  <div id="clientes"></div>
+    <section class="clients-section">
+      <h2>Clientes Ativos</h2>
+      <div id="clientes" class="clients-grid"></div>
+    </section>
+  </div>
 
   <audio id="alarme" src="./alarme.mp3" preload="auto"></audio>
   <script src="./script.js"></script>
-
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
-        .then(() => console.log("Service Worker registrado com sucesso"))
-        .catch(err => console.log("Erro ao registrar Service Worker:", err));
+        .catch(console.error);
     }
   </script>
 </body>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Produtos - MAX GAMES</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .produtos-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .produto {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .produto:last-child {
+      border-bottom: none;
+    }
+
+    .produto-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .produto-info span:first-child {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .produto-info span:last-child {
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+    }
+
+    .center {
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .escondido {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Produtos</h1>
+      <div>
+        <button onclick="window.location.href='index.html'">← Voltar</button>
+      </div>
+    </header>
+
+    <div class="center">
+      <button onclick="abrirModal()" class="destaque">+ Novo Produto</button>
+    </div>
+
+    <section class="produtos-box" id="lista-produtos">
+      <!-- Produtos serão listados aqui -->
+    </section>
+
+    <!-- Modal -->
+    <div class="modal escondido" id="modal-produto">
+      <div class="modal-content">
+        <h2>Novo Produto</h2>
+        <input type="text" id="produto-nome" placeholder="Nome do produto" />
+        <input type="number" id="produto-valor" placeholder="Valor (R$)" step="0.01" />
+        <input type="number" id="produto-quantidade" placeholder="Quantidade (opcional)" />
+        <div class="modal-actions">
+          <button onclick="salvarProduto()">Salvar</button>
+          <button onclick="fecharModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const produtosKey = "produtos";
+    let produtos = JSON.parse(localStorage.getItem(produtosKey)) || [];
+
+    const listaProdutos = document.getElementById("lista-produtos");
+    const modal = document.getElementById("modal-produto");
+
+    const nomeInput = document.getElementById("produto-nome");
+    const valorInput = document.getElementById("produto-valor");
+    const qtdInput = document.getElementById("produto-quantidade");
+
+    function renderProdutos() {
+      listaProdutos.innerHTML = "";
+      if (produtos.length === 0) {
+        listaProdutos.innerHTML = "<p style='text-align:center;'>Nenhum produto cadastrado.</p>";
+        return;
+      }
+
+      produtos.forEach((p, index) => {
+        const div = document.createElement("div");
+        div.className = "produto";
+        div.innerHTML = `
+          <div class="produto-info">
+            <span>${p.nome}</span>
+            <span>R$ ${p.valor.toFixed(2)} ${p.qtd ? `(Qtd: ${p.qtd})` : ""}</span>
+          </div>
+          <button onclick="removerProduto(${index})">Remover</button>
+        `;
+        listaProdutos.appendChild(div);
+      });
+    }
+
+    function abrirModal() {
+      nomeInput.value = "";
+      valorInput.value = "";
+      qtdInput.value = "";
+      modal.classList.remove("escondido");
+    }
+
+    function fecharModal() {
+      modal.classList.add("escondido");
+    }
+
+    function salvarProduto() {
+      const nome = nomeInput.value.trim();
+      const valor = parseFloat(valorInput.value);
+      const qtd = parseInt(qtdInput.value) || null;
+
+      if (!nome || isNaN(valor)) {
+        alert("Preencha o nome e valor corretamente.");
+        return;
+      }
+
+      produtos.push({ nome, valor, qtd });
+      localStorage.setItem(produtosKey, JSON.stringify(produtos));
+      fecharModal();
+      renderProdutos();
+    }
+
+    function removerProduto(index) {
+      if (confirm("Remover este produto?")) {
+        produtos.splice(index, 1);
+        localStorage.setItem(produtosKey, JSON.stringify(produtos));
+        renderProdutos();
+      }
+    }
+
+    window.onload = renderProdutos;
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
   --accent: #e91e63;
   --bg: #f9f9f9;
   --white: #fff;
-  --zebra: #f3f3f3;
+  --zebra: #f3f3f9;
 }
 
 * {
@@ -25,37 +25,52 @@ body {
   padding: 0 15px;
 }
 
+/* Header */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
-
 header h1 {
   color: var(--primary);
   font-size: 1.8em;
 }
-
-header button {
+.header-buttons button {
+  margin-left: 8px;
   background: var(--primary);
-  color: var(--white);
+  color: #fff;
   padding: 8px 12px;
+  border: none;
   border-radius: 6px;
+  cursor: pointer;
 }
 
+/* Section boxes */
+.section-box {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.section-box h2 {
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+
+/* Hidden default */
+.escondido {
+  display: none !important;
+}
+
+/* Centered button */
 .center {
   text-align: center;
   margin-bottom: 15px;
 }
 
-.clients-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 15px;
-}
-
-/* Destaque dos botões principais */
+/* Highlighted buttons */
 .destaque {
   background: var(--accent);
   color: #fff;
@@ -64,104 +79,20 @@ header button {
   border: none;
   border-radius: 6px;
   box-shadow: 0 0 8px var(--accent);
+  cursor: pointer;
+}
+button.alinhar {
+  vertical-align: middle;
 }
 
-/* Formulário e Configuração */
-.form-section,
-.clients-section,
-#config {
-  background: var(--white);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+/* Clients grid */
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
 }
 
-.form-box,
-.config-box {
-  max-width: 400px;
-  margin: auto;
-}
-
-/* Alinhamento das linhas de formulário */
-.form-row,
-.config-row {
-  display: flex;
-  flex-wrap: nowrap;       /* não quebrar em colunas */
-  justify-content: center; /* centraliza horizontal */
-  align-items: center;     /* alinha vertical */
-  gap: 20px;               /* espaçamento entre itens */
-  margin-bottom: 15px;
-}
-
-/* Labels dentro de form-row */
-.form-row label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 500;
-}
-
-/* Comboboxes com largura fixa e espaçamento */
-#nome,
-#tempo {
-  width: 180px;            /* largura igual */
-}
-
-/* Espaço extra abaixo dos selects */
-#nome,
-#tempo {
-  margin-bottom: 10px;
-}
-
-/* Campos comuns */
-select,
-input,
-button {
-  font-size: 1em;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-select,
-input {
-  padding: 8px 12px;
-  background: #fff;
-}
-
-/* Tabela de histórico */
-.table-container {
-  overflow-x: auto;
-  margin-bottom: 15px;
-}
-
-table#historicoTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95em;
-}
-
-#historicoTable thead {
-  background: var(--primary);
-  color: #fff;
-}
-
-#historicoTable th,
-#historicoTable td {
-  padding: 8px 12px;
-  text-align: left;
-}
-
-#historicoTable tbody tr:nth-child(odd) {
-  background: var(--zebra);
-}
-
-#historicoTable tbody tr:hover {
-  background: var(--accent);
-  color: #fff;
-}
-
-/* Clientes */
+/* Client card */
 .cliente {
   background: var(--white);
   border-radius: 8px;
@@ -169,35 +100,116 @@ table#historicoTable {
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   text-align: center;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
 .cliente img {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
   margin-bottom: 8px;
 }
-
 .cliente p {
   font-size: 0.9em;
   color: #555;
 }
 
-/* Ícone de edição no modal */
-.edit-icon {
-  cursor: pointer;
-  margin-left: 8px;
-  font-size: 0.9em;
-  vertical-align: middle;
+/* Table styling */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 15px;
+}
+#historicoTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+#historicoTable thead {
+  background: var(--primary);
+  color: #fff;
+}
+#historicoTable th,
+#historicoTable td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+#historicoTable tbody tr:nth-child(odd) {
+  background: var(--zebra);
+}
+#historicoTable tbody tr:hover {
+  background: var(--accent);
+  color: #fff;
 }
 
-/* Modal */
+/* Form and config rows */
+.form-section,
+.clients-section,
+#valoresSection,
+#configSection {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.form-box,
+.config-row,
+.form-row {
+  max-width: 400px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.form-row {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+.config-row {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+.form-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+#nome,
+#tempo,
+#modal-produtos-lista {
+  width: 180px;
+  margin-bottom: 10px;
+}
+select,
+input,
+button {
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+select,
+input {
+  padding: 8px 12px;
+  background: #fff;
+}
+
+/* Modal styling */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0,0,0,0.6);
   display: flex;
   align-items: center;
@@ -205,19 +217,45 @@ table#historicoTable {
   padding: 10px;
   z-index: 10;
 }
-
 .modal-content {
   background: var(--white);
   border-radius: 8px;
   padding: 20px;
-  max-width: 320px;
+  max-width: 350px;
   width: 100%;
 }
-
 .modal-content h2 {
-  margin-bottom: 10px;
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
+}
+.edit-icon {
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 0.9em;
+}
+.modal-content h3 {
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: var(--primary);
+  font-size: 1em;
+}
+
+#modal-consumos {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 10px;
+}
+#modal-consumos li {
+  margin-bottom: 6px;
+}
+
+.modal-add-produto {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+  align-items: center;
+  width: 100%;
 }
 
 .modal-actions {
@@ -226,7 +264,6 @@ table#historicoTable {
   gap: 8px;
   margin-top: 15px;
 }
-
 .modal-actions button,
 .modal-actions select {
   flex: 1;
@@ -235,15 +272,42 @@ table#historicoTable {
   border-radius: 6px;
 }
 
-.escondido {
-  display: none !important;
-}
-
-/* Responsivo para telas pequenas */
+/* Responsive */
 @media (max-width: 600px) {
   .form-row,
   .config-row,
-  .modal-actions {
+  .modal-actions,
+  .modal-add-produto {
     flex-direction: column;
+    align-items: stretch;
   }
+}
+/* Status de pagamento nas linhas da tabela */
+#historicoTable tbody tr.paid {
+  background: #c8e6c9 !important;  /* verde claro */
+}
+#historicoTable tbody tr.pending {
+  background: #fff9c4 !important;  /* amarelo claro */
+}
+
+/* Botões de status no modal de detalhes */
+.modal-status {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+.modal-status button {
+  flex: 1;
+  padding: 8px;
+  font-size: 0.9em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal-status #btnDevendo {
+  background: #fff176; /* amarelo */
+}
+.modal-status #btnPago {
+  background: #81c784; /* verde */
 }

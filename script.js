@@ -1,246 +1,289 @@
 // script.js
 
-// Elementos do DOM
-const mostrarFormBtn = document.getElementById("mostrarForm");
-const formSection    = document.getElementById("form-section");
-const tipoRadios     = document.getElementsByName("tipo");
-const nomeSelect     = document.getElementById("nome");
-const tempoSelect    = document.getElementById("tempo");
-const adicionarBtn   = document.getElementById("adicionar");
-const precoHoraInput = document.getElementById("precoHora");
-const salvarPrecoBtn = document.getElementById("salvarPreco");
-const abrirConfigBtn = document.getElementById("abrirConfig");
-const configSection  = document.getElementById("config");
-const limparHistBtn  = document.getElementById("limparHistorico");
-const historicoTbody = document.querySelector("#historicoTable tbody");
-const clientesDiv    = document.getElementById("clientes");
-const alarme         = document.getElementById("alarme");
+// --- Elementos do DOM ---
+const btnValores      = document.getElementById("btnValores");
+const btnConfig       = document.getElementById("btnConfig");
+const valoresSection  = document.getElementById("valoresSection");
+const configSection   = document.getElementById("configSection");
+const formSection     = document.getElementById("formSection");
+const mostrarFormBtn  = document.getElementById("mostrarForm");
 
-const modal        = document.getElementById("modal");
-const mNomeText    = document.getElementById("modal-nome-text");
-const mEdit        = document.getElementById("modal-edit");
-const mInicio      = document.getElementById("modal-inicio");
-const mTempo       = document.getElementById("modal-tempo");
-const mValor       = document.getElementById("modal-valor");
-const mParar       = document.getElementById("modal-parar");
-const mAddTempo    = document.getElementById("modal-adicionar-tempo");
-const mLista       = document.getElementById("modal-tempos-lista");
-const mFechar      = document.getElementById("modal-fechar");
+const precoPS5Input   = document.getElementById("precoPS5");
+const precoPCInput    = document.getElementById("precoPC");
+const salvarPS5Btn    = document.getElementById("salvarPS5");
+const salvarPCBtn     = document.getElementById("salvarPC");
+const limparHistBtn   = document.getElementById("limparHistoricoValores");
+const historicoTable  = document.querySelector("#historicoTable tbody");
 
-// Dados em memória
-let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+const tipoRadios      = document.getElementsByName("tipo");
+const nomeSelect      = document.getElementById("nome");
+const tempoSelect     = document.getElementById("tempo");
+const adicionarBtn    = document.getElementById("adicionar");
+const clientesDiv     = document.getElementById("clientes");
+
+const modal           = document.getElementById("modal");
+const mNomeText       = document.getElementById("modal-nome-text");
+const mEdit           = document.getElementById("modal-edit");
+const mInicio         = document.getElementById("modal-inicio");
+const mTempo          = document.getElementById("modal-tempo");
+const mValor          = document.getElementById("modal-valor");
+const mConsumosList   = document.getElementById("modal-consumos");
+const mTotalProdutos  = document.getElementById("modal-total-produtos");
+const mTotalGeral     = document.getElementById("modal-total-geral");
+const mParar          = document.getElementById("modal-parar");
+const mAddTempo       = document.getElementById("modal-adicionar-tempo");
+const mLista          = document.getElementById("modal-tempos-lista");
+const mProdSelect     = document.getElementById("modal-produtos-lista");
+const mAddProdutoBtn  = document.getElementById("modal-adicionar-produto");
+const mFechar         = document.getElementById("modal-fechar");
+const alarme          = document.getElementById("alarme");
+
+// --- Dados persistentes ---
+let clientes  = JSON.parse(localStorage.getItem("clientes"))  || [];
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
 let ativoIndex = null;
 
-// Carrega precoHora
-precoHoraInput.value = localStorage.getItem("precoHora") || 6;
+// --- Função para alternar abas ---
+function showSection(sec) {
+  [valoresSection, configSection, formSection].forEach(s=> s.classList.add("escondido"));
+  sec.classList.remove("escondido");
+}
+btnValores.onclick     = ()=> showSection(valoresSection);
+btnConfig.onclick      = ()=> showSection(configSection);
+mostrarFormBtn.onclick = ()=> showSection(formSection);
 
-// Persistência
-const salvarClientes  = () => localStorage.setItem("clientes", JSON.stringify(clientes));
-const salvarHistorico = () => localStorage.setItem("historico", JSON.stringify(historico));
-const salvarPreco     = () => {
-  localStorage.setItem("precoHora", precoHoraInput.value);
-  alert("Preço salvo!");
+// --- Carrega tarifas salvas ---
+precoPS5Input.value = localStorage.getItem("precoPS5") || 6;
+precoPCInput.value  = localStorage.getItem("precoPC")  || 6;
+
+// --- Salvamento de tarifas ---
+salvarPS5Btn.onclick = ()=>{
+  localStorage.setItem("precoPS5", precoPS5Input.value);
+  alert("Preço PS5 salvo!");
+};
+salvarPCBtn.onclick = ()=>{
+  localStorage.setItem("precoPC", precoPCInput.value);
+  alert("Preço PC salvo!");
 };
 
-// Renderiza histórico na tabela
-function carregarHistorico() {
-  historicoTbody.innerHTML = "";
-  historico.forEach(item => {
+// --- Renderiza histórico resumido com status colorido ---
+function renderHistorico(){
+  historicoTable.innerHTML = "";
+  historico.forEach((h, i) => {
     const tr = document.createElement("tr");
-    const data = new Date(item.data || Date.now()).toLocaleDateString('pt-BR');
+    if (h.status === "paid")    tr.classList.add("paid");
+    if (h.status === "pending") tr.classList.add("pending");
     tr.innerHTML = `
-      <td>${item.tipo} ${item.nome}</td>
-      <td>R$ ${item.valor.toFixed(2)}</td>
-      <td>${data}</td>
+      <td>${h.nome}</td>
+      <td>R$ ${h.totalGeral.toFixed(2)}</td>
+      <td>${new Date(h.data).toLocaleDateString("pt-BR")}</td>
     `;
-    historicoTbody.appendChild(tr);
+    tr.ondblclick = () => abrirDetalhes(h, i);
+    historicoTable.appendChild(tr);
   });
 }
 
-// Listeners de toggle
-mostrarFormBtn.onclick = () => formSection.classList.toggle("escondido");
-abrirConfigBtn.onclick = () => {
-  configSection.classList.toggle("escondido");
-  carregarHistorico();
-};
-salvarPrecoBtn.onclick = salvarPreco;
-limparHistBtn.onclick = () => {
-  if (confirm("Limpar histórico?")) {
+// --- Limpar histórico na aba Valores ---
+limparHistBtn.onclick = ()=>{
+  if(confirm("Limpar histórico?")){
     historico = [];
-    salvarHistorico();
-    carregarHistorico();
+    localStorage.setItem("historico", JSON.stringify(historico));
+    renderHistorico();
   }
 };
 
-// Combobox dinâmica e exibição de campos
-function atualizarNomeETempo() {
-  const tipo = [...tipoRadios].find(r => r.checked)?.value;
+// --- Parar cliente e salvar detalhes no histórico ---
+function pararClienteDetalhado(idx){
+  const c = clientes[idx];
+  const totalProdutos = (c.produtos||[]).reduce((sum,p)=>sum + p.valor*p.qtd,0);
+  const valorTempo = c.valor;
+  const entry = {
+    nome:c.nome,
+    tipo:c.tipo,
+    valorTempo,
+    produtos:c.produtos||[],
+    totalProdutos,
+    totalGeral:valorTempo+totalProdutos,
+    data:new Date().toISOString(),
+    status:null
+  };
+  historico.push(entry);
+  localStorage.setItem("historico", JSON.stringify(historico));
+  clientes.splice(idx,1);
+  localStorage.setItem("clientes", JSON.stringify(clientes));
+  renderClientes();
+  renderHistorico();
+}
+
+// --- Abre modal de detalhes do histórico e adiciona botões Pago/Devendo ---
+function abrirDetalhes(h, index){
+  const md = document.createElement("div");
+  md.className = "modal";
+  md.innerHTML = `
+    <div class="modal-content">
+      <h2>${h.nome} — ${h.tipo}</h2>
+      <p><strong>Data:</strong> ${new Date(h.data).toLocaleString("pt-BR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit",year:"numeric"})}</p>
+      <p><strong>Tempo:</strong> R$ ${h.valorTempo.toFixed(2)}</p>
+      <h3>Produtos</h3>
+      <ul>
+        ${h.produtos.length>0 
+           ? h.produtos.map(p=>`<li>${p.nome} (x${p.qtd}) – R$ ${(p.valor*p.qtd).toFixed(2)}</li>`).join("") 
+           : "<li>— nenhum —</li>"
+        }
+      </ul>
+      <p><strong>Total produtos:</strong> R$ ${h.totalProdutos.toFixed(2)}</p>
+      <p><strong>Total geral:</strong> R$ ${h.totalGeral.toFixed(2)}</p>
+      <div class="modal-status">
+        <button id="btnDevendo">Devendo</button>
+        <button id="btnPago">Pago</button>
+      </div>
+      <div style="text-align:right; margin-top:10px;">
+        <button id="fecharHistDetalhes">Fechar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(md);
+
+  document.getElementById("fecharHistDetalhes").onclick = ()=> md.remove();
+
+  // Define status e atualiza linha
+  document.getElementById("btnDevendo").onclick = ()=>{
+    historico[index].status = "pending";
+    localStorage.setItem("historico", JSON.stringify(historico));
+    renderHistorico();
+    md.remove();
+  };
+  document.getElementById("btnPago").onclick = ()=>{
+    historico[index].status = "paid";
+    localStorage.setItem("historico", JSON.stringify(historico));
+    renderHistorico();
+    md.remove();
+  };
+}
+
+// --- Combobox dinâmica para adicionar cliente ---
+function atualizarNomeETempo(){
+  const tipo = [...tipoRadios].find(r=>r.checked)?.value;
   nomeSelect.innerHTML = "";
-  const usados = clientes.filter(c => c.tipo === tipo).map(c => c.nome);
-  let i = 1;
-  while (usados.includes(`${tipo} ${i}`)) i++;
-  nomeSelect.add(new Option(`${tipo} ${i}`, `${tipo} ${i}`));
+  const usados = clientes.filter(c=>c.tipo===tipo).map(c=>c.nome);
+  let i=1; while(usados.includes(`${tipo} ${i}`)) i++;
+  nomeSelect.add(new Option(`${tipo} ${i}`,`${tipo} ${i}`));
   nomeSelect.classList.remove("escondido");
   tempoSelect.classList.remove("escondido");
 }
-[...tipoRadios].forEach(r => r.onchange = atualizarNomeETempo);
+[...tipoRadios].forEach(r=>r.onchange = atualizarNomeETempo);
 
-// Adicionar cliente
-adicionarBtn.onclick = () => {
-  const tipo = [...tipoRadios].find(r => r.checked)?.value;
+// --- Adiciona novo cliente ---
+adicionarBtn.onclick = ()=>{
+  const tipo = [...tipoRadios].find(r=>r.checked)?.value;
   const nome = nomeSelect.value;
   const tMin = parseFloat(tempoSelect.value);
-  if (!tipo || !nome || isNaN(tMin)) return alert("Preencha todos os campos!");
-
+  if(!tipo||!nome||isNaN(tMin)) return alert("Preencha todos os campos!");
   const now = Date.now();
-  const preco = parseFloat(precoHoraInput.value) || 0;
-  const valorFixo = tMin > 0 ? (tMin / 60) * preco : 0;
-
-  clientes.push({
-    tipo, nome, tMin, valor: valorFixo,
-    inicio: now, alertado: false, aberto: tMin === 0
-  });
-  salvarClientes();
+  const priceKey = tipo==="PS5" ? "precoPS5" : "precoPC";
+  const preco = parseFloat(localStorage.getItem(priceKey))||0;
+  const valorFixo = tMin>0 ? (tMin/60)*preco : 0;
+  clientes.push({ tipo,nome,tMin,valor:valorFixo,inicio:now,alertado:false,aberto:tMin===0,produtos:[] });
+  localStorage.setItem("clientes",JSON.stringify(clientes));
   renderClientes();
-
-  // reset form
-  formSection.classList.add("escondido");
-  nomeSelect.classList.add("escondido");
-  tempoSelect.classList.add("escondido");
-  [...tipoRadios].forEach(r => r.checked = false);
+  showSection(formSection);
 };
 
-// Atualização em tempo real dos cards
-setInterval(() => {
-  document.querySelectorAll(".cliente").forEach((card, idx) => {
-    const c = clientes[idx];
-    const p = card.querySelector("p");
-    if (c.aberto) {
-      p.textContent = formatDuration(Date.now() - c.inicio);
+// --- Atualização em tempo real dos cards ---
+setInterval(()=>{
+  document.querySelectorAll(".cliente").forEach((card,idx)=>{
+    const c=clientes[idx], p=card.querySelector("p");
+    if(c.aberto){
+      p.textContent = formatDuration(Date.now()-c.inicio);
     } else {
-      const rem = c.inicio + c.tMin * 60000 - Date.now();
-      p.textContent = rem > 0
-        ? `Restante ${formatDuration(rem)}`
-        : "Esgotado";
-      if (rem <= 0 && !c.alertado) {
+      const rem = c.inicio + c.tMin*60000 - Date.now();
+      p.textContent = rem>0 ? `Restante ${formatDuration(rem)}` : "Esgotado";
+      if(rem<=0 && !c.alertado){
         alarme.play();
-        if (Notification.permission === "granted") {
-          new Notification("Tempo esgotado", { body: `${c.nome} acabou!` });
-        }
-        c.alertado = true;
-        salvarClientes();
+        if(Notification.permission==="granted")
+          new Notification("Tempo esgotado",{body:`${c.nome} acabou!`});
+        c.alertado=true;
+        localStorage.setItem("clientes",JSON.stringify(clientes));
       }
     }
   });
-}, 1000);
+},1000);
 
-function renderClientes() {
-  clientesDiv.innerHTML = "";
-  clientes.forEach((c, idx) => {
-    const card = document.createElement("div");
-    card.className = "cliente";
-    card.onclick = () => abrirModal(idx);
-
-    card.innerHTML = `
-      <strong style="display:block; margin-bottom:4px;">${c.nome}</strong>
-      <img src="${c.tipo === 'PS5' ? 'ps5.jpg' : 'PC.png'}" alt="${c.tipo}">
+// --- Renderiza clientes ativos ---
+function renderClientes(){
+  clientesDiv.innerHTML="";
+  clientes.forEach((c,idx)=>{
+    const card=document.createElement("div");
+    card.className="cliente";
+    card.onclick=()=>abrirModal(idx);
+    card.innerHTML=`
+      <strong style="display:block;margin-bottom:4px;">${c.nome}</strong>
+      <img src="${c.tipo==='PS5'?'ps5.jpg':'PC.png'}" alt="${c.tipo}">
       <p></p>
     `;
-
-    clientesDiv.append(card);
+    clientesDiv.appendChild(card);
   });
 }
 
-// Formata ms em “Xm Ys”
-function formatDuration(ms) {
-  const m = Math.floor(ms / 60000),
-        s = Math.floor((ms % 60000) / 1000);
+// --- Formata ms em texto ---
+function formatDuration(ms){
+  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000);
   return `${m}m ${s}s`;
 }
 
-// Abre modal de um cliente
-function abrirModal(idx) {
-  ativoIndex = idx;
-  const c = clientes[idx];
-  mNomeText.textContent = c.nome;
-  mInicio.textContent = new Date(c.inicio).toLocaleString('pt-BR', {
-    hour: '2-digit', minute: '2-digit',
-    day: '2-digit', month: '2-digit', year: 'numeric'
-  });
-  mValor.textContent = c.aberto
-    ? ((Date.now() - c.inicio) / 3600000 * parseFloat(precoHoraInput.value)).toFixed(2)
-    : c.valor.toFixed(2);
-  atualizarModalTempo();
-
+// --- Abre modal do cliente ---
+function abrirModal(idx){
+  ativoIndex=idx; const c=clientes[idx];
+  mNomeText.textContent=c.nome;
+  mInicio.textContent=new Date(c.inicio).toLocaleString("pt-BR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit",year:"numeric"});
+  mValor.textContent=c.valor.toFixed(2);
+  mConsumosList.innerHTML=(c.produtos||[]).map(p=>`<li>${p.nome} (x${p.qtd}) – R$ ${(p.valor*p.qtd).toFixed(2)}</li>`).join("")||"<li>— nenhum —</li>";
+  const totalProd=(c.produtos||[]).reduce((s,p)=>s+p.valor*p.qtd,0);
+  mTotalProdutos.textContent=totalProd.toFixed(2);
+  mTotalGeral.textContent=(c.valor+totalProd).toFixed(2);
+  const prodList=JSON.parse(localStorage.getItem("produtos"))||[];
+  mProdSelect.innerHTML=prodList.map((p,i)=>`<option value="${i}">${p.nome} — R$ ${p.valor.toFixed(2)}</option>`).join("");
   mParar.classList.remove("escondido");
-  const expirou = (!c.aberto && Date.now() >= c.inicio + c.tMin * 60000);
-  mAddTempo.classList.toggle("escondido", !expirou);
-  mLista.classList.toggle("escondido", !expirou);
-
+  const expirou=!c.aberto && Date.now()>=c.inicio+c.tMin*60000;
+  mAddTempo.classList.toggle("escondido",!expirou);
+  mLista.classList.toggle("escondido",!expirou);
   modal.classList.remove("escondido");
 }
 
-// Atualiza tempo no modal
-function atualizarModalTempo() {
-  const c = clientes[ativoIndex];
-  mTempo.textContent = c.aberto
-    ? formatDuration(Date.now() - c.inicio)
-    : (Date.now() < c.inicio + c.tMin * 60000
-        ? formatDuration(c.inicio + c.tMin * 60000 - Date.now())
-        : "Esgotado");
-}
-
-// Ações do Modal
-mFechar.onclick = () => modal.classList.add("escondido");
-
-mParar.onclick = () => {
-  const c = clientes[ativoIndex];
-  historico.push({
-    tipo: c.tipo,
-    nome: c.nome,
-    tempo: c.aberto
-      ? Math.floor((Date.now() - c.inicio) / 60000)
-      : c.tMin,
-    valor: c.valor,
-    data: Date.now()
-  });
-  clientes.splice(ativoIndex, 1);
-  salvarClientes();
-  salvarHistorico();
-  renderClientes();
-  carregarHistorico();
-  modal.classList.add("escondido");
-};
-
-mAddTempo.onclick = () => {
-  const extra = parseFloat(mLista.value);
-  const c = clientes[ativoIndex];
-  if (!c.aberto) {
-    c.tMin += extra > 0 ? extra : 0;
-    c.inicio = Date.now();
-    c.valor += (extra / 60) * parseFloat(precoHoraInput.value);
-    c.alertado = false;
-    salvarClientes();
-    renderClientes();
-    abrirModal(ativoIndex);
+// --- Ações do modal cliente ---
+mFechar.onclick = ()=> modal.classList.add("escondido");
+mParar.onclick  = ()=> pararClienteDetalhado(ativoIndex);
+mAddTempo.onclick = ()=>{
+  const extra=parseFloat(mLista.value), c=clientes[ativoIndex];
+  if(!c.aberto){
+    c.tMin+=extra>0?extra:0; c.inicio=Date.now();
+    const key=c.tipo==="PS5"?"precoPS5":"precoPC";
+    c.valor+=(extra/60)*(parseFloat(localStorage.getItem(key))||0);
+    c.alertado=false;
+    localStorage.setItem("clientes",JSON.stringify(clientes));
+    renderClientes(); abrirModal(ativoIndex);
   }
 };
-
-// **Listener do lápis para editar nome**
-mEdit.onclick = () => {
-  const novo = prompt("Digite o novo nome:", clientes[ativoIndex].nome);
-  if (novo) {
-    clientes[ativoIndex].nome = novo;
-    salvarClientes();
-    renderClientes();
-    abrirModal(ativoIndex);
-  }
+mAddProdutoBtn.onclick = ()=>{
+  const i=parseInt(mProdSelect.value), list=JSON.parse(localStorage.getItem("produtos"))||[];
+  const p=list[i]; if(!p) return;
+  const c=clientes[ativoIndex];
+  c.produtos=c.produtos||[];
+  c.produtos.push({nome:p.nome,valor:p.valor,qtd:1});
+  localStorage.setItem("clientes",JSON.stringify(clientes));
+  abrirModal(ativoIndex);
+};
+mEdit.onclick = ()=>{
+  const novo=prompt("Novo nome:",clientes[ativoIndex].nome);
+  if(novo){clientes[ativoIndex].nome=novo;localStorage.setItem("clientes",JSON.stringify(clientes));renderClientes();abrirModal(ativoIndex);}
 };
 
-// Inicialização
-window.onload = () => {
+// --- Inicialização ---
+window.onload = ()=>{
+  // Garante status em cada entrada
+  historico = historico.map(h=> h.status!==undefined ? h : {...h,status:null});
+  showSection(formSection);
   renderClientes();
-  carregarHistorico();
-  if ("Notification" in window) Notification.requestPermission();
+  renderHistorico();
+  if("Notification" in window) Notification.requestPermission();
 };

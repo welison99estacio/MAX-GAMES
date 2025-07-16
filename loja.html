@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Loja - MAX GAMES</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Cores específicas para a loja */
+    header { background: #1e88e5; }
+    header h1, header button { color: #fff; }
+    .section-box.store { background: #e3f2fd; }
+    .store-search input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #90caf9;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .store-search .destaque {
+      background: #42a5f5;
+      margin-bottom: 20px;
+    }
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+      gap: 15px;
+    }
+    .item-card {
+      background: #fff;
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .item-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    #debtsList {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 10px;
+    }
+    #debtsList li {
+      background: #fff3e0;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+    /* Modal overrides */
+    .modal-content {
+      max-width: 360px;
+    }
+    .modal-content input {
+      border: 1px solid #90caf9;
+    }
+    .modal-actions button#btnPagar {
+      background: #42a5f5;
+      color: #fff;
+    }
+    .modal-actions button#btnDepois {
+      background: #bdbdbd;
+      color: #333;
+    }
+    .modal-actions { margin-top: 15px; }
+    .modal-actions button { flex: 1; }
+    #btnFechar {
+      margin-top: 12px;
+      background: #e0e0e0;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Loja de Eletrônicos</h1>
+      <div class="header-buttons">
+        <button onclick="location.href='index.html'">← Voltar</button>
+      </div>
+    </header>
+
+    <section class="section-box store">
+      <div class="store-search">
+        <input id="search" placeholder="Buscar produto…" />
+        <button id="btnDevedores" class="destaque">Devedores</button>
+        <ul id="debtsList"></ul>
+      </div>
+
+      <div class="items-grid" id="itemsList">
+        <!-- cards de produtos serão inseridos aqui -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal de venda/devendo -->
+  <div id="modalLoja" class="modal escondido">
+    <div class="modal-content">
+      <h2 id="modalItemNome"></h2>
+      <input id="buyerName" placeholder="Nome do comprador" />
+      <input id="buyerQty" type="number" min="1" placeholder="Quantidade" />
+      <div class="modal-actions">
+        <button id="btnPagar">Pagar</button>
+        <button id="btnDepois">Pagar Depois</button>
+      </div>
+      <button id="btnFechar">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    const STORE_KEY = "storeItems";
+    const DEBTS_KEY = "debts";
+
+    const searchInput = document.getElementById("search");
+    const itemsList   = document.getElementById("itemsList");
+    const debtsList   = document.getElementById("debtsList");
+    const btnDevedores= document.getElementById("btnDevedores");
+
+    const modalLoja   = document.getElementById("modalLoja");
+    const modalNome   = document.getElementById("modalItemNome");
+    const buyerName   = document.getElementById("buyerName");
+    const buyerQty    = document.getElementById("buyerQty");
+    const btnPagar    = document.getElementById("btnPagar");
+    const btnDepois   = document.getElementById("btnDepois");
+    const btnFechar   = document.getElementById("btnFechar");
+
+    let storeItems = JSON.parse(localStorage.getItem(STORE_KEY)) || [
+      { nome: "Headset Gamer", preco: 120 },
+      { nome: "Controle PS5", preco: 250 },
+      { nome: "Teclado RGB", preco: 180 }
+    ];
+    let debts = JSON.parse(localStorage.getItem(DEBTS_KEY)) || [];
+    let currentItem = null;
+
+    function renderItems(filter="") {
+      itemsList.innerHTML = "";
+      storeItems
+        .filter(i => i.nome.toLowerCase().includes(filter.toLowerCase()))
+        .forEach((i, idx) => {
+          const div = document.createElement("div");
+          div.className = "item-card";
+          div.innerHTML = `<strong>${i.nome}</strong><p>R$ ${i.preco.toFixed(2)}</p>`;
+          div.ondblclick = () => {
+            currentItem = i;
+            modalNome.textContent = i.nome;
+            buyerName.value = "";
+            buyerQty.value  = 1;
+            modalLoja.classList.remove("escondido");
+          };
+          itemsList.appendChild(div);
+        });
+    }
+
+    searchInput.oninput = () => renderItems(searchInput.value);
+
+    btnDevedores.onclick = () => {
+      debtsList.innerHTML = "";
+      const names = [...new Set(debts.map(d => d.buyer))];
+      if (!names.length) {
+        debtsList.innerHTML = "<li>Nenhum devedor.</li>";
+      } else {
+        names.forEach(n => {
+          const li = document.createElement("li");
+          li.textContent = n;
+          debtsList.appendChild(li);
+        });
+      }
+    };
+
+    btnFechar.onclick = () => modalLoja.classList.add("escondido");
+
+    btnPagar.onclick = () => {
+      const buyer = buyerName.value.trim();
+      const qty   = parseInt(buyerQty.value);
+      if (!buyer || isNaN(qty) || qty < 1) {
+        return alert("Preencha nome e quantidade.");
+      }
+      modalLoja.classList.add("escondido");
+      alert(`Venda confirmada: ${buyer} comprou ${qty}× ${currentItem.nome}`);
+    };
+
+    btnDepois.onclick = () => {
+      const buyer = buyerName.value.trim();
+      const qty   = parseInt(buyerQty.value);
+      if (!buyer || isNaN(qty) || qty < 1) {
+        return alert("Preencha nome e quantidade.");
+      }
+      debts.push({ buyer, product: currentItem.nome, qty });
+      localStorage.setItem(DEBTS_KEY, JSON.stringify(debts));
+      modalLoja.classList.add("escondido");
+      alert(`Registrado como devendo: ${buyer} deve ${qty}× ${currentItem.nome}`);
+    };
+
+    window.onload = () => {
+      renderItems();
+    };
+  </script>
+</body>
+</html>

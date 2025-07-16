@@ -1,57 +1,64 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MAX GAMES - Gerenciador</title>
-  <link rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0055aa">
-  <link rel="icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
+    <!-- Header com botões reorganizados -->
     <header>
       <h1>Gerenciador de Tempo</h1>
-      <button id="abrirConfig">⚙ Configurações</button>
+      <div class="header-buttons">
+        <button id="btnValores">Valores</button>
+        <button onclick="location.href='produtos.html'">Produtos</button>
+        <button onclick="location.href='loja.html'">Loja</button>
+        <button id="btnConfig">Configuração</button>
+      </div>
     </header>
 
-    <!-- Configurações -->
-    <section id="config" class="escondido">
-      <div class="config-box">
-        <h2>Configurações</h2>
-        <div class="config-row">
-          <label for="precoHora">Valor por hora (R$):</label>
-          <input type="number" id="precoHora" step="0.01" min="0">
-          <button id="salvarPreco">💾 Salvar</button>
-        </div>
-        <h3>Histórico</h3>
-        <div class="table-container">
-          <table id="historicoTable">
-            <thead>
-              <tr>
-                <th>Equipamento</th>
-                <th>Valor (R$)</th>
-                <th>Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Linhas inseridas via JS -->
-            </tbody>
-          </table>
-        </div>
-        <button id="limparHistorico">Limpar Histórico</button>
+    <!-- Aba Valores (Histórico) -->
+    <section id="valoresSection" class="section-box escondido">
+      <h2>Histórico de Uso</h2>
+      <div class="table-container">
+        <table id="historicoTable">
+          <thead>
+            <tr>
+              <th>Equipamento</th>
+              <th>Valor (R$)</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Linhas inseridas via JS -->
+          </tbody>
+        </table>
+      </div>
+      <button id="limparHistoricoValores" class="destaque">Limpar Histórico</button>
+    </section>
+
+    <!-- Aba Configuração de Preço -->
+    <section id="configSection" class="section-box escondido">
+      <h2>Configuração de Preço</h2>
+      <div class="config-row">
+        <label for="precoPS5">Preço PS5 (R$/h):</label>
+        <input type="number" id="precoPS5" step="0.01" min="0">
+        <button id="salvarPS5">💾 Salvar</button>
+      </div>
+      <div class="config-row">
+        <label for="precoPC">Preço PC (R$/h):</label>
+        <input type="number" id="precoPC" step="0.01" min="0">
+        <button id="salvarPC">💾 Salvar</button>
       </div>
     </section>
 
-    <!-- Botão para mostrar formulário -->
-    <div class="center">
-      <button id="mostrarForm" class="destaque">Adicionar cliente</button>
-    </div>
-
-    <!-- Formulário -->
-    <section id="form-section" class="form-section escondido">
+    <!-- Aba Adicionar Cliente -->
+    <section id="formSection" class="form-section escondido">
       <div class="form-box">
         <div class="form-row">
           <label><input type="radio" name="tipo" value="PS5"> PS5</label>
@@ -71,9 +78,14 @@
             <option value="0.083">Teste (5 s)</option>
           </select>
         </div>
-        <button id="adicionar" class="destaque">🎮 Adicionar</button>
+        <button id="adicionar" class="destaque alinhar">🎮 Adicionar</button>
       </div>
     </section>
+
+    <!-- Botão para abrir formulário -->
+    <div class="center">
+      <button id="mostrarForm" class="destaque alinhar">Adicionar cliente</button>
+    </div>
 
     <!-- Clientes Ativos -->
     <section class="clients-section">
@@ -82,7 +94,7 @@
     </section>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal de Cliente -->
   <div id="modal" class="modal escondido">
     <div class="modal-content">
       <h2>
@@ -91,7 +103,18 @@
       </h2>
       <p><strong>Início:</strong> <span id="modal-inicio"></span></p>
       <p><strong>Tempo restante:</strong> <span id="modal-tempo"></span></p>
-      <p><strong>Valor:</strong> R$ <span id="modal-valor"></span></p>
+      <p><strong>Valor tempo:</strong> R$ <span id="modal-valor"></span></p>
+
+      <h3>Produtos Consumidos</h3>
+      <ul id="modal-consumos"></ul>
+      <p><strong>Total produtos:</strong> R$ <span id="modal-total-produtos">0.00</span></p>
+      <p><strong>Total geral:</strong> R$ <span id="modal-total-geral">0.00</span></p>
+
+      <div class="modal-add-produto">
+        <select id="modal-produtos-lista"></select>
+        <button id="modal-adicionar-produto">+ Produto</button>
+      </div>
+
       <div class="modal-actions">
         <button id="modal-parar">Parar</button>
         <button id="modal-adicionar-tempo" class="escondido">Adicionar Tempo</button>
@@ -109,7 +132,7 @@
     </div>
   </div>
 
-  <audio id="alarme" src="./alarme.mp3" preload="auto"></audio>
-  <script src="./script.js"></script>
+  <audio id="alarme" src="alarme.mp3" preload="auto"></audio>
+  <script src="script.js"></script>
 </body>
 </html>

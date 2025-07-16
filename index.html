@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MAX GAMES - Gerenciador</title>
+  <title>MAX GAMES</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0055aa">
   <link rel="icon" href="icon-192.png">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-light">
   <div class="container">
-    <!-- Header com botões reorganizados -->
+    <!-- HEADER COM BOTÕES -->
     <header>
-      <h1>Gerenciador de Tempo</h1>
+      <img src="logo.png" alt="MAX GAMES" id="logoHeader">
       <div class="header-buttons">
+        <button id="mostrarForm" class="destaque">Adicionar cliente</button>
         <button id="btnValores">Valores</button>
         <button onclick="location.href='produtos.html'">Produtos</button>
         <button onclick="location.href='loja.html'">Loja</button>
@@ -22,7 +23,7 @@
       </div>
     </header>
 
-    <!-- Aba Valores (Histórico) -->
+    <!-- ABA VALORES -->
     <section id="valoresSection" class="section-box escondido">
       <h2>Histórico de Uso</h2>
       <div class="table-container">
@@ -34,17 +35,23 @@
               <th>Data</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Linhas inseridas via JS -->
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
       <button id="limparHistoricoValores" class="destaque">Limpar Histórico</button>
     </section>
 
-    <!-- Aba Configuração de Preço -->
+    <!-- ABA CONFIGURAÇÕES -->
     <section id="configSection" class="section-box escondido">
-      <h2>Configuração de Preço</h2>
+      <h2>Configurações</h2>
+      <div class="config-row">
+        <label>Tema:</label>
+        <label class="switch">
+          <input type="checkbox" id="toggleTheme">
+          <span class="slider"></span>
+        </label>
+        <span id="themeLabel">Claro</span>
+      </div>
       <div class="config-row">
         <label for="precoPS5">Preço PS5 (R$/h):</label>
         <input type="number" id="precoPS5" step="0.01" min="0">
@@ -55,10 +62,16 @@
         <input type="number" id="precoPC" step="0.01" min="0">
         <button id="salvarPC">💾 Salvar</button>
       </div>
+      <div class="config-row">
+        <button id="exportClientes">⬇ Exportar Clientes</button>
+        <input type="file" id="importFile" accept=".json" class="escondido">
+        <button id="importClientes">⬆ Importar Clientes</button>
+      </div>
     </section>
 
-    <!-- Aba Adicionar Cliente -->
+    <!-- ABA ADICIONAR CLIENTE -->
     <section id="formSection" class="form-section escondido">
+      <h2>Adicionar Cliente</h2>
       <div class="form-box">
         <div class="form-row">
           <label><input type="radio" name="tipo" value="PS5"> PS5</label>
@@ -73,8 +86,13 @@
             <option value="60">1 h</option>
             <option value="90">1:30 h</option>
             <option value="120">2 h</option>
+            <option value="150">2:30 h</option>
+            <option value="180">3 h</option>
+            <option value="210">3:30 h</option>
+            <option value="240">4 h</option>
+            <option value="270">4:30 h</option>
+            <option value="300">5 h</option>
             <option value="0">Tempo Aberto</option>
-            <!-- DEBUG: 5s -->
             <option value="0.083">Teste (5 s)</option>
           </select>
         </div>
@@ -82,19 +100,14 @@
       </div>
     </section>
 
-    <!-- Botão para abrir formulário -->
-    <div class="center">
-      <button id="mostrarForm" class="destaque alinhar">Adicionar cliente</button>
-    </div>
-
-    <!-- Clientes Ativos -->
+    <!-- CLIENTES ATIVOS -->
     <section class="clients-section">
       <h2>Clientes Ativos</h2>
       <div id="clientes" class="clients-grid"></div>
     </section>
   </div>
 
-  <!-- Modal de Cliente -->
+  <!-- MODAL CLIENTE -->
   <div id="modal" class="modal escondido">
     <div class="modal-content">
       <h2>
@@ -109,24 +122,30 @@
       <ul id="modal-consumos"></ul>
       <p><strong>Total produtos:</strong> R$ <span id="modal-total-produtos">0.00</span></p>
       <p><strong>Total geral:</strong> R$ <span id="modal-total-geral">0.00</span></p>
+      <p class="small">Clique no 🗑️ para remover um consumo.</p>
 
       <div class="modal-add-produto">
         <select id="modal-produtos-lista"></select>
-        <button id="modal-adicionar-produto">+ Produto</button>
+        <button id="modal-adicionar-produto" class="destaque">+ Produto</button>
       </div>
 
       <div class="modal-actions">
-        <button id="modal-parar">Parar</button>
-        <button id="modal-adicionar-tempo" class="escondido">Adicionar Tempo</button>
         <select id="modal-tempos-lista" class="escondido">
           <option value="30">30 min</option>
           <option value="60">1 h</option>
           <option value="90">1:30 h</option>
           <option value="120">2 h</option>
+          <option value="150">2:30 h</option>
+          <option value="180">3 h</option>
+          <option value="210">3:30 h</option>
+          <option value="240">4 h</option>
+          <option value="270">4:30 h</option>
+          <option value="300">5 h</option>
           <option value="0">Tempo Aberto</option>
-          <!-- DEBUG: 5s -->
           <option value="0.083">Teste (5 s)</option>
         </select>
+        <button id="modal-adicionar-tempo" class="escondido destaque">+ Tempo</button>
+        <button id="modal-parar" class="destaque">Parar</button>
         <button id="modal-fechar">Fechar</button>
       </div>
     </div>

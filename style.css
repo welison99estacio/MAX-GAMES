@@ -36,13 +36,27 @@ header button {
 }
 
 .form-section,
-.clients-section {
+.clients-section,
+#config {
   background: var(--white);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
+.config-box h2 { margin-bottom: 12px; color: var(--primary); }
+.config-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.config-row input { flex: 1; }
+.config-row button {
+  background: var(--accent);
+}
+
+.config-actions { margin-top: 15px; }
 
 .form-row {
   display: flex;
@@ -109,6 +123,13 @@ button.destaque {
   color: #555;
 }
 
+.edit-icon {
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 0.9em;
+  vertical-align: middle;
+}
+
 .escondido { display: none !important; }
 
 /* Modal */
@@ -123,7 +144,7 @@ button.destaque {
   padding: 20px; max-width: 320px; width: 100%;
 }
 .modal-content h2 {
-  margin-bottom: 10px; color: var(--primary);
+  margin-bottom: 10px; display: flex; align-items: center;
 }
 .modal-actions {
   display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px;

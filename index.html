@@ -17,47 +17,24 @@
       <button id="abrirConfig">⚙ Configurações</button>
     </header>
 
-    <!-- Modal -->
-    <div id="modal" class="modal escondido">
-      <div class="modal-content">
-        <h2 id="modal-nome"></h2>
-        <p><strong>Início:</strong> <span id="modal-inicio"></span></p>
-        <p><strong>Tempo restante:</strong> <span id="modal-tempo"></span></p>
-        <p><strong>Valor:</strong> R$ <span id="modal-valor"></span></p>
-        <div class="modal-actions">
-          <button id="modal-parar">Parar</button>
-          <button id="modal-adicionar-tempo" class="escondido">Adicionar Tempo</button>
-          <select id="modal-tempos-lista" class="escondido">
-            <option value="30">30 min</option>
-            <option value="60">1h</option>
-            <option value="90">1:30h</option>
-            <option value="120">2h</option>
-            <option value="0">Tempo Aberto</option>
-            <!-- DEBUG: 5s -->
-            <option value="0.083">Teste (5s)</option>
-          </select>
-          <button id="modal-salvar-nome">Salvar Nome</button>
-          <button id="modal-fechar">Fechar</button>
-        </div>
-      </div>
-    </div>
-
+    <!-- Configurações -->
     <section id="config" class="escondido">
       <div class="config-box">
         <h2>Configurações</h2>
         <div class="config-row">
           <label for="precoHora">Valor por hora (R$):</label>
-          <input type="number" id="precoHora" value="6" step="0.01" min="0">
+          <input type="number" id="precoHora" step="0.01" min="0">
+          <button id="salvarPreco">💾 Salvar</button>
         </div>
         <h3>Histórico de Uso</h3>
         <ul id="historico"></ul>
         <div class="config-actions">
           <button id="limparHistorico">Limpar Histórico</button>
-          <button id="fecharConfig">Fechar</button>
         </div>
       </div>
     </section>
 
+    <!-- Formulário -->
     <section class="form-section">
       <form id="formulario">
         <div class="form-row">
@@ -65,22 +42,50 @@
           <select id="nome"></select>
         </div>
         <div id="temposRapidos" class="form-row">
-          <button type="button" data-min="30">30 min</button>
-          <button type="button" data-min="60">1h</button>
-          <button type="button" data-min="90">1:30h</button>
-          <button type="button" data-min="120">2h</button>
-          <button type="button" data-min="0">Tempo Aberto</button>
+          <button type="button" data-min="30">30 min</button>
+          <button type="button" data-min="60">1 h</button>
+          <button type="button" data-min="90">1:30 h</button>
+          <button type="button" data-min="120">2 h</button>
+          <button type="button" data-min="0">Tempo Aberto</button>
           <!-- DEBUG: tempo de teste -->
-          <button type="button" data-min="0.083">Teste (5s)</button>
+          <button type="button" data-min="0.083">Teste (5 s)</button>
         </div>
         <button id="adicionar" type="submit" class="destaque">🎮 Adicionar</button>
       </form>
     </section>
 
+    <!-- Clientes Ativos -->
     <section class="clients-section">
       <h2>Clientes Ativos</h2>
       <div id="clientes" class="clients-grid"></div>
     </section>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal escondido">
+    <div class="modal-content">
+      <h2 id="modal-nome">
+        <span id="modal-nome-text"></span>
+        <span id="modal-edit" class="edit-icon">🖉</span>
+      </h2>
+      <p><strong>Início:</strong> <span id="modal-inicio"></span></p>
+      <p><strong>Tempo restante:</strong> <span id="modal-tempo"></span></p>
+      <p><strong>Valor:</strong> R$ <span id="modal-valor"></span></p>
+      <div class="modal-actions">
+        <button id="modal-parar">Parar</button>
+        <button id="modal-adicionar-tempo" class="escondido">Adicionar Tempo</button>
+        <select id="modal-tempos-lista" class="escondido">
+          <option value="30">30 min</option>
+          <option value="60">1 h</option>
+          <option value="90">1:30 h</option>
+          <option value="120">2 h</option>
+          <option value="0">Tempo Aberto</option>
+          <!-- DEBUG: 5s -->
+          <option value="0.083">Teste (5 s)</option>
+        </select>
+        <button id="modal-fechar">Fechar</button>
+      </div>
+    </div>
   </div>
 
   <audio id="alarme" src="./alarme.mp3" preload="auto"></audio>

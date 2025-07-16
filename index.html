@@ -17,6 +17,31 @@
       <button id="abrirConfig">⚙ Configurações</button>
     </header>
 
+    <!-- Modal -->
+    <div id="modal" class="modal escondido">
+      <div class="modal-content">
+        <h2 id="modal-nome"></h2>
+        <p><strong>Início:</strong> <span id="modal-inicio"></span></p>
+        <p><strong>Tempo restante:</strong> <span id="modal-tempo"></span></p>
+        <p><strong>Valor:</strong> R$ <span id="modal-valor"></span></p>
+        <div class="modal-actions">
+          <button id="modal-parar">Parar</button>
+          <button id="modal-adicionar-tempo" class="escondido">Adicionar Tempo</button>
+          <select id="modal-tempos-lista" class="escondido">
+            <option value="30">30 min</option>
+            <option value="60">1h</option>
+            <option value="90">1:30h</option>
+            <option value="120">2h</option>
+            <option value="0">Tempo Aberto</option>
+            <!-- DEBUG: 5s -->
+            <option value="0.083">Teste (5s)</option>
+          </select>
+          <button id="modal-salvar-nome">Salvar Nome</button>
+          <button id="modal-fechar">Fechar</button>
+        </div>
+      </div>
+    </div>
+
     <section id="config" class="escondido">
       <div class="config-box">
         <h2>Configurações</h2>
@@ -60,11 +85,5 @@
 
   <audio id="alarme" src="./alarme.mp3" preload="auto"></audio>
   <script src="./script.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js')
-        .catch(console.error);
-    }
-  </script>
 </body>
 </html>

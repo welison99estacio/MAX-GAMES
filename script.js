@@ -11,162 +11,182 @@ const historicoUl = document.getElementById("historico");
 const limparHistoricoBtn = document.getElementById("limparHistorico");
 const alarme = document.getElementById("alarme");
 
+const modal = document.getElementById("modal");
+const mNome = document.getElementById("modal-nome");
+const mInicio = document.getElementById("modal-inicio");
+const mTempo = document.getElementById("modal-tempo");
+const mValor = document.getElementById("modal-valor");
+const mParar = document.getElementById("modal-parar");
+const mAddTempo = document.getElementById("modal-adicionar-tempo");
+const mLista = document.getElementById("modal-tempos-lista");
+const mSalvarNome = document.getElementById("modal-salvar-nome");
+const mFechar = document.getElementById("modal-fechar");
+
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
 let tempoSelecionado = null;
+let ativoIndex = null;
 
-// --- persistência ---
-function salvarClientes() { localStorage.setItem("clientes", JSON.stringify(clientes)); }
-function salvarHistorico() { localStorage.setItem("historico", JSON.stringify(historico)); }
-function carregarHistorico() {
+// persistência
+const salvarClientes = ()=> localStorage.setItem("clientes", JSON.stringify(clientes));
+const salvarHistorico = ()=> localStorage.setItem("historico", JSON.stringify(historico));
+
+// histórico
+function carregarHistorico(){
   historicoUl.innerHTML = "";
-  historico.forEach(i => {
-    const li = document.createElement("li");
-    li.textContent = `${i.tipo} ${i.nome} — ${i.tempo} min — R$ ${i.valor.toFixed(2)}`;
+  historico.forEach(i=>{
+    const li=document.createElement("li");
+    li.textContent=`${i.tipo} ${i.nome} — ${i.tempo} min — R$ ${i.valor.toFixed(2)}`;
     historicoUl.appendChild(li);
   });
 }
 
-// --- configurações ---
-limparHistoricoBtn.onclick = () => {
-  if (confirm("Limpar histórico?")) {
-    historico = []; salvarHistorico(); carregarHistorico();
+// config
+limparHistoricoBtn.onclick = ()=> {
+  if(confirm("Limpar histórico?")){
+    historico=[]; salvarHistorico(); carregarHistorico();
   }
 };
-abrirConfigBtn.onclick = () => { configSection.classList.remove("escondido"); carregarHistorico(); };
-fecharConfigBtn.onclick = () => configSection.classList.add("escondido");
+abrirConfigBtn.onclick = ()=>{ configSection.classList.remove("escondido"); carregarHistorico(); };
+fecharConfigBtn.onclick = ()=> configSection.classList.add("escondido");
 
-// --- combobox dinâmica ---
-function atualizarNomeCombo() {
-  const tipo = tipoSelect.value;
-  nomeSelect.innerHTML = "";
-  const usados = clientes.filter(c => c.tipo===tipo).map(c=>c.nome);
-  let i=1;
-  while (usados.includes(`${tipo} ${i}`)) i++;
-  nomeSelect.add(new Option(`${tipo} ${i}`, `${tipo} ${i}`));
-}
-tipoSelect.onchange = atualizarNomeCombo;
-
-// --- seleção de tempo rápido ---
-document.querySelectorAll("#temposRapidos button").forEach(btn=>{
-  btn.onclick = () => {
-    tempoSelecionado = parseFloat(btn.dataset.min);
-    document.querySelectorAll("#temposRapidos button")
-      .forEach(x=>x.classList.remove("selecionado"));
-    btn.classList.add("selecionado");
-  };
-});
-
-// --- adicionar cliente ---
-form.onsubmit = e => {
-  e.preventDefault();
-  if (tempoSelecionado===null) return alert("Selecione um tempo!");
-  const tipo = tipoSelect.value;
-  const nome = nomeSelect.value;
-  const tempoMin = tempoSelecionado;
-  const precoHora = parseFloat(precoHoraInput.value)||0;
-  // valor fixo para tempos >0
-  const valorFixo = tempoMin>0 ? (tempoMin/60)*precoHora : 0;
-  const now = Date.now();
-  clientes.push({
-    tipo, nome,
-    tempoMin, valor: valorFixo,
-    inicio: now,
-    alertado: false,
-    aberto: tempoMin===0
-  });
-  salvarClientes(); renderClientes(); atualizarNomeCombo();
-  tempoSelecionado = null;
-  form.querySelectorAll("#temposRapidos button").forEach(x=>x.classList.remove("selecionado"));
-};
-
-// --- renderização e contadores ---
-function renderClientes() {
-  clientesDiv.innerHTML = "";
-  clientes.forEach((c, idx) => {
-    const div = document.createElement("div");
-    div.className = "cliente" + (c.aberto && c.alertado ? " expirado" : "");
-
-    // imagem
-    const img = document.createElement("img");
-    img.src = c.tipo==="PS5"?"ps5.jpg":"PC.png";
-    img.className = "cliente-img";
-
-    // nome e valor
-    const h3 = document.createElement("h3"); h3.textContent = c.nome;
-    const pVal = document.createElement("p");
-    pVal.textContent = c.aberto
-      ? `R$ ${((Date.now()-c.inicio)/3600000*parseFloat(precoHoraInput.value)).toFixed(2)}`
-      : `R$ ${c.valor.toFixed(2)}`;
-
-    // tempo
-    const pTime = document.createElement("p");
-    if (c.aberto) {
-      // cronômetro cresce
-      setInterval(()=>{
-        const ms = Date.now()-c.inicio;
-        const m = Math.floor(ms/60000), s = Math.floor((ms%60000)/1000);
-        pTime.textContent = `Usado: ${m}m ${s}s`;
-      }, 1000);
-    } else {
-      // countdown fixo
-      const target = c.inicio + c.tempoMin*60000;
-      const iv = setInterval(()=>{
-        const rem = target - Date.now();
-        if (rem<=0) {
-          pTime.textContent = "Tempo esgotado!";
-          if (!c.alertado) { alarme.play(); c.alertado=true; }
-          clearInterval(iv);
-        } else {
-          const m = Math.floor(rem/60000), s = Math.floor((rem%60000)/1000);
-          pTime.textContent = `Restante: ${m}m ${s}s`;
-        }
-      }, 1000);
-    }
-
-    // botões
-    const actions = document.createElement("div"); actions.className="actions";
-    const stopBtn = document.createElement("button"); stopBtn.textContent="Parar";
-    stopBtn.onclick = ()=>{
-      // adiciona ao histórico
-      const tempoUsado = c.aberto
-        ? ((Date.now()-c.inicio)/60000).toFixed(0)
-        : c.tempoMin;
-      const valorFinal = c.aberto
-        ? ((Date.now()-c.inicio)/3600000*parseFloat(precoHoraInput.value))
-        : c.valor;
-      historico.push({ tipo:c.tipo, nome:c.nome, tempo:tempoUsado, valor:valorFinal });
-      salvarHistorico(); carregarHistorico();
-      clientes.splice(idx,1); salvarClientes(); renderClientes(); atualizarNomeCombo();
-    };
-    const addTimeBtn = document.createElement("button"); addTimeBtn.textContent="Adicionar Tempo";
-    addTimeBtn.onclick = ()=>{
-      const escolha = prompt("Digite minutos para adicionar (30,60,90,120,0 para aberto):");
-      const m = parseFloat(escolha);
-      if (isNaN(m)) return;
-      c.tempoMin = c.aberto ? 0 : c.tempoMin + (m>0? m: 0);
-      if (m>0) c.valor += (m/60)*parseFloat(precoHoraInput.value);
-      c.alertado = false;
-      c.inicio = Date.now();
-      salvarClientes(); renderClientes(); atualizarNomeCombo();
-    };
-    const remBtn = document.createElement("button"); remBtn.textContent="Remover";
-    remBtn.onclick = ()=>{
-      if (confirm("Remover cliente?")) {
-        clientes.splice(idx,1); salvarClientes(); renderClientes(); atualizarNomeCombo();
-      }
-    };
-
-    actions.append(stopBtn, addTimeBtn, remBtn);
-    div.append(img,h3,pTime,pVal,actions);
-    clientesDiv.append(div);
-  });
-}
-
-window.onload = () => {
-  // inicializa selects
-  ["PS5","PC"].forEach(t=>tipoSelect.add(new Option(t,t)));
+// opções iniciais
+window.onload = ()=>{
+  ["PS5","PC"].forEach(t=> tipoSelect.add(new Option(t,t)));
   atualizarNomeCombo();
   renderClientes();
   carregarHistorico();
 };
+
+// combobox dinâmica
+function atualizarNomeCombo(){
+  const tipo=tipoSelect.value;
+  nomeSelect.innerHTML="";
+  const usados=clientes.filter(c=>c.tipo===tipo).map(c=>c.nome);
+  let i=1;
+  while(usados.includes(`${tipo} ${i}`)) i++;
+  nomeSelect.add(new Option(`${tipo} ${i}`,`${tipo} ${i}`));
+}
+tipoSelect.onchange = atualizarNomeCombo;
+
+// seleção de tempo
+document.querySelectorAll("#temposRapidos button").forEach(btn=>{
+  btn.onclick = ()=>{
+    tempoSelecionado=parseFloat(btn.dataset.min);
+    document.querySelectorAll("#temposRapidos button")
+      .forEach(b=>b.classList.remove("selecionado"));
+    btn.classList.add("selecionado");
+  };
+});
+
+// adicionar cliente
+form.onsubmit = e=>{
+  e.preventDefault();
+  if(tempoSelecionado===null) return alert("Selecione um tempo!");
+  const tipo=tipoSelect.value, nome=nomeSelect.value;
+  const tMin=tempoSelecionado, now=Date.now();
+  const preco= parseFloat(precoHoraInput.value)||0;
+  const valorFixo = tMin>0 ? (tMin/60)*preco : 0;
+  clientes.push({ tipo,nome,tMin,valor:valorFixo,inicio:now,alertado:false,aberto:tMin===0 });
+  salvarClientes(); renderClientes(); atualizarNomeCombo();
+  tempoSelecionado=null;
+  form.querySelectorAll("#temposRapidos button")
+    .forEach(b=>b.classList.remove("selecionado"));
+};
+
+// renderiza clientes
+function renderClientes(){
+  clientesDiv.innerHTML="";
+  clientes.forEach((c,idx)=>{
+    const card=document.createElement("div");
+    card.className="cliente";
+    card.onclick = ()=> abrirModal(idx);
+    const img=document.createElement("img");
+    img.src = c.tipo==="PS5"?"ps5.jpg":"PC.png";
+    const pTempo=document.createElement("p");
+    pTempo.textContent = c.aberto
+      ? formatDuration(Date.now()-c.inicio)
+      : `Restante ${formatDuration(c.tMin*60000 - (Date.now()-c.inicio))}`;
+    card.append(img,pTempo);
+    clientesDiv.append(card);
+  });
+}
+
+// utilitário tempo
+function formatDuration(ms){
+  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000);
+  return `${m}m ${s}s`;
+}
+
+// modal
+function abrirModal(idx){
+  ativoIndex=idx;
+  const c=clientes[idx];
+  mNome.textContent = c.nome;
+  const data=new Date(c.inicio);
+  mInicio.textContent = `${String(data.getHours()).padStart(2,'0')}:${String(data.getMinutes()).padStart(2,'0')} - ${String(data.getDate()).padStart(2,'0')}/${String(data.getMonth()+1).padStart(2,'0')}/${data.getFullYear()}`;
+  mValor.textContent = c.valor.toFixed(2);
+  atualizarModalTempo();
+  // botões
+  mParar.classList.remove("escondido");
+  mLista.classList.add("escondido");
+  mAddTempo.classList.add("escondido");
+  if(!c.aberto && Date.now() >= c.inicio + c.tMin*60000){
+    mAddTempo.classList.remove("escondido");
+    mLista.classList.remove("escondido");
+  }
+  modal.classList.remove("escondido");
+}
+
+// tempo no modal
+function atualizarModalTempo(){
+  const c=clientes[ativoIndex];
+  if(c.aberto){
+    mTempo.textContent = formatDuration(Date.now()-c.inicio);
+  } else {
+    const rem = c.inicio + c.tMin*60000 - Date.now();
+    mTempo.textContent = rem>0 ? formatDuration(rem) : "Esgotado";
+  }
+}
+
+// ações modal
+mFechar.onclick = ()=> modal.classList.add("escondido");
+
+mParar.onclick = ()=>{
+  const c=clientes[ativoIndex];
+  historico.push({
+    tipo:c.tipo, nome:c.nome,
+    tempo: c.aberto ? Math.floor((Date.now()-c.inicio)/60000) : c.tMin,
+    valor: c.valor
+  });
+  clientes.splice(ativoIndex,1);
+  salvarClientes(); salvarHistorico(); renderClientes(); modal.classList.add("escondido"); atualizarNomeCombo();
+};
+
+mAddTempo.onclick = ()=>{
+  const extra = parseFloat(mLista.value);
+  const c=clientes[ativoIndex];
+  // só para expirados
+  if(!c.aberto){
+    c.tMin += extra>0? extra: 0;
+    c.inicio = Date.now();
+    c.valor += (extra/60)*parseFloat(precoHoraInput.value);
+    c.alertado=false;
+    salvarClientes(); renderClientes(); abrirModal(ativoIndex);
+  }
+};
+
+mSalvarNome.onclick = ()=>{
+  const novo = prompt("Novo nome:", clientes[ativoIndex].nome);
+  if(novo){
+    clientes[ativoIndex].nome = novo;
+    salvarClientes(); renderClientes(); abrirModal(ativoIndex);
+  }
+};
+
+// atualizar tempo do modal a cada segundo
+setInterval(()=>{
+  if(ativoIndex!==null && !modal.classList.contains("escondido")){
+    atualizarModalTempo();
+  }
+},1000);

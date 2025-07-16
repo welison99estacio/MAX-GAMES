@@ -1,130 +1,149 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #f4f4f4;
-  padding: 20px;
-  max-width: 800px;
-  margin: auto;
+  font-family: 'Inter', sans-serif;
+  background-color: #f9f9f9;
+  margin: 20px;
+  color: #222;
 }
 
-h1, h2 {
-  text-align: center;
-  margin-bottom: 10px;
+h1, h2, h3 {
+  color: #0055aa;
 }
 
 button {
   cursor: pointer;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 6px;
   border: none;
-  border-radius: 5px;
-}
-
-#abrirConfig {
-  display: block;
-  margin: 10px auto;
-  background: #333;
+  background-color: #0077cc;
   color: white;
-  padding: 8px 15px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
 }
 
-#config {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  background: #e0e0e0;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 20px;
+button:hover {
+  background-color: #005fa3;
 }
 
-#config input {
-  width: 100px;
-  padding: 5px;
-  font-size: 16px;
+button:disabled {
+  background-color: #ccc;
+  cursor: default;
 }
 
-.escondido {
-  display: none;
+button.destaque {
+  background-color: #e91e63;
+  font-size: 1.1em;
+  font-weight: 700;
+  padding: 12px 20px;
+  box-shadow: 0 0 10px #e91e63aa;
+  border: 2px solid #c2185b;
 }
 
-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-input, select {
-  padding: 10px;
-  font-size: 16px;
-}
-
-#temposRapidos {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  justify-content: center;
+button.destaque:hover {
+  background-color: #c2185b;
+  box-shadow: 0 0 15px #c2185bcc;
 }
 
 #temposRapidos button {
-  padding: 6px 12px;
-  background: #ddd;
-  transition: background 0.3s;
+  background-color: #555;
+  font-weight: 600;
+  margin-right: 8px;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  border-radius: 4px;
+  transition: background-color 0.25s ease;
+}
+
+#temposRapidos button:hover {
+  background-color: #444;
 }
 
 #temposRapidos button.selecionado {
-  background: #0055aa;
-  color: white;
+  background-color: #0077cc;
+  box-shadow: 0 0 8px #0077ccaa;
 }
 
-#clientes {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+form {
+  margin-bottom: 30px;
 }
 
 .cliente {
-  background: white;
-  padding: 15px;
-  border-left: 5px solid green;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 6px #ddd;
+  gap: 15px;
 }
 
-.cliente.expirado {
-  border-left-color: red;
-  background-color: #ffe5e5;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-}
-
-button.remover {
-  background: red;
-  color: white;
-  padding: 5px 10px;
-}
-
-.nome-editavel {
-  cursor: pointer;
-  text-decoration: underline dotted;
-}
-
-.cliente img {
+.cliente-img {
   width: 60px;
   height: 60px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
-  margin-right: 10px;
+  border: 1px solid #ccc;
 }
 
-.cliente .conteudo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.cliente h3 {
+  margin: 0 10px 0 0;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.cliente p {
+  margin: 0 15px 0 0;
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.cliente button {
+  margin-left: auto;
+  padding: 8px 12px;
+  font-size: 0.85em;
+}
+
+.escondido {
+  display: none !important;
+}
+
+#config {
+  background-color: #f0f8ff;
+  border: 2px solid #0055aa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  max-width: 400px;
+}
+
+.config-box h2, .config-box h3 {
+  margin-top: 0;
+}
+
+#historico {
+  max-height: 150px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: #333;
+}
+
+#historico li {
+  margin-bottom: 6px;
+}
+
+select, input[type=number] {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+  font-size: 1em;
+}
+
+#nome {
+  min-width: 150px;
 }
